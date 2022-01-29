@@ -1,0 +1,12 @@
+/dist
+# TODO remove line below when you will stop using vercel
+/public
+/src-bex/www
+/src-capacitor
+/src-cordova
+/.quasar
+/node_modules
+.eslintrc.js
+babel.config.js
+/src-ssr
+# **/*fake*.ts

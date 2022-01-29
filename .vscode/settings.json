@@ -1,0 +1,21 @@
+{
+  "vetur.validation.template": false,
+  "vetur.format.enable": false,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "vetur.experimental.templateInterpolationService": true,
+
+  "stylelint.validate": ["css", "scss"],
+  "xo.enable": false,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+
+  "volar.completion.preferredTagNameCase": "kebab",
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "editor.formatOnSave": true
+}
