@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter/types'
-import { MockData } from '.'
-import { LoginData } from '../user/login'
+import { LoginData } from 'src/services/user/login'
+import { MockUsers } from '.'
 
 export const mockLogin = (
   mock: MockAdapter,
   url: string,
-  mockData: MockData,
+  mockUsers: MockUsers,
 ) => {
   mock.onPost(url).reply(async (config) => {
     await new Promise((resolve) => setTimeout(resolve, 1500))
@@ -13,7 +13,7 @@ export const mockLogin = (
     const { email, password } = JSON.parse(config.data) as LoginData
 
     if (email && password) {
-      const data = Object.entries(mockData).find(
+      const data = Object.entries(mockUsers).find(
         ([, value]) => value.email === email && value.password === password,
       )
 
@@ -21,9 +21,12 @@ export const mockLogin = (
         return [
           200,
           {
-            token: data[0].split(' ')[1],
+            token: {
+              access: data[0].split(' ')[1],
+              refresh: data[0].split(' ')[1],
+            },
             user: {
-              name: data[1].name,
+              isBusy: data[1].isBusy,
             },
           },
         ]

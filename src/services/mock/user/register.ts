@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter/types'
-import { MockData } from '.'
-import { RegData } from '../user/register'
+import { RegData } from 'src/services/user/register'
+import { MockUsers } from '.'
 
 export const mockRegister = (
   mock: MockAdapter,
   url: string,
-  mockData: MockData,
+  mockUsers: MockUsers,
 ) => {
   mock.onPost(url).reply(async (config) => {
     await new Promise((resolve) => setTimeout(resolve, 1500))
@@ -14,7 +14,7 @@ export const mockRegister = (
       JSON.parse(config.data) as RegData
 
     if (name && email && password && gender && birthDate && number && city) {
-      if (Object.values(mockData).find((user) => user.email === email)) {
+      if (Object.values(mockUsers).find((user) => user.email === email)) {
         return [
           400,
           {
@@ -23,7 +23,7 @@ export const mockRegister = (
         ]
       }
 
-      if (Object.values(mockData).find((user) => user.number === number)) {
+      if (Object.values(mockUsers).find((user) => user.number === number)) {
         return [
           400,
           {
@@ -35,10 +35,13 @@ export const mockRegister = (
       return [
         200,
         {
-          token: 'user-4-token',
+          token: {
+            access: 'user-4-token',
+            refresh: 'user-4-token',
+          },
 
           user: {
-            name,
+            isBusy: Math.random() > 0.5,
           },
         },
       ]

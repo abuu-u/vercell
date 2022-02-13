@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
-import { Loading } from 'quasar'
 import { getUser } from 'src/services/user'
 import { login, LoginData } from 'src/services/user/login'
 import { logout } from 'src/services/user/logout'
 import { RegData, register } from 'src/services/user/register'
+import { getStatus } from 'src/services/user/status'
 
 interface User {
-  name: string
+  isBusy: boolean
   error: string
 }
 
@@ -14,7 +14,7 @@ const useUser = defineStore({
   id: 'user-module',
   state(): User {
     return {
-      name: getUser()?.name || '',
+      isBusy: getUser()?.isBusy ?? false,
       error: '',
     }
   },
@@ -22,37 +22,43 @@ const useUser = defineStore({
   actions: {
     async register(data: RegData) {
       this.error = ''
-      Loading.show()
 
       const res = await register(data)
-      Loading.hide()
 
       if (res.error) {
         this.error = res.error
       } else {
-        this.name = res.data?.user.name || ''
+        this.isBusy = res.data?.user.isBusy ?? false
         await this.$router.push('/link-telegram')
       }
     },
 
     async login(data: LoginData) {
       this.error = ''
-      Loading.show()
 
       const res = await login(data)
-      Loading.hide()
 
       if (res.error) {
         this.error = res.error
       } else {
-        this.name = res.data?.user.name || ''
+        this.isBusy = res.data?.user.isBusy ?? false
         await this.$router.push('/')
       }
     },
 
     async logout() {
-      this.name = ''
+      this.isBusy = false
       await logout()
+    },
+
+    async getStatus() {
+      const res = await getStatus()
+
+      if (res.error) {
+        //
+      } else {
+        this.isBusy = res.data?.user.isBusy ?? false
+      }
     },
   },
 })

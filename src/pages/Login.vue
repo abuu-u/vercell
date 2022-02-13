@@ -37,6 +37,7 @@ import { required } from 'src/components/validators'
 import AuthLayout from 'src/layouts/AuthLayout.vue'
 import { storeToRefs } from 'pinia'
 import useUser from 'src/pinia/user'
+import { Loading } from 'quasar'
 
 const emailRef = ref(null)
 const passwordRef = ref(null)
@@ -50,10 +51,14 @@ const rules = {
 
 const onSubmit = async () => {
   if (emailRef.value && passwordRef.value) {
+    Loading.show()
+
     await user.login({
       email: emailRef.value,
       password: passwordRef.value,
     })
+
+    Loading.hide()
   }
 }
 </script>

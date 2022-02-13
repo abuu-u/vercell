@@ -1,14 +1,17 @@
 import { defineStore } from 'pinia'
 
-export interface ColorState {
-  primary: string
-  secondary: string
-  accent: string
-  dark: string
-  positive: string
-  negative: string
-  info: string
-  warning: string
+export type Colors =
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'dark'
+  | 'positive'
+  | 'negative'
+  | 'info'
+  | 'warning'
+
+export type ColorState = {
+  [k in Colors]: string
 }
 
 const useColorTheme = defineStore({

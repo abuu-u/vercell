@@ -5,7 +5,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "vetur.experimental.templateInterpolationService": true,
 
-  "stylelint.validate": ["css", "scss"],
+  "stylelint.validate": ["css", "scss", "vue"],
   "xo.enable": false,
   "css.validate": false,
   "less.validate": false,

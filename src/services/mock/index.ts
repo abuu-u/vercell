@@ -1,48 +1,25 @@
-import { AxiosInstance } from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import { genders, RegData } from '../user/register'
-import { mockLogin } from './login'
-import { mockLogout } from './logout'
-import { mockRegister } from './register'
+import { messages } from './chat'
+import { mockGetMessages } from './chat/get-messages'
+import { mockGetRandomMessage } from './chat/get-random-message'
+import { mockSendMessage } from './chat/send-message'
+import { users } from './user'
+import { mockLogin } from './user/login'
+import { mockLogout } from './user/logout'
+import { mockRefresh } from './user/refreshToken'
+import { mockRegister } from './user/register'
+import { mockStatus } from './user/status'
 
-export interface MockData {
-  [k: string]: RegData
+export const mockApi = (mockApiAdapter: MockAdapter) => {
+  mockRegister(mockApiAdapter, '/register', users)
+  mockLogin(mockApiAdapter, '/login', users)
+  mockLogout(mockApiAdapter, '/logout')
+  mockRefresh(mockApiAdapter, '/refresh', users)
+  mockGetRandomMessage(mockApiAdapter, '/messages/random')
 }
 
-export const mockApi = (api: AxiosInstance) => {
-  const mock = new MockAdapter(api)
-
-  const users: MockData = {
-    'Bearer user-1-token': {
-      name: 'user1',
-      email: 'user1@mail.com',
-      password: 'user123',
-      gender: genders[0],
-      birthDate: '2022/02/02',
-      number: 1234567,
-      city: 'city 1',
-    },
-    'Bearer user-2-token': {
-      name: 'user2',
-      email: 'user2@mail.com',
-      password: 'user123',
-      gender: genders[1],
-      birthDate: '2022/02/02',
-      number: 12345678,
-      city: 'city 2',
-    },
-    'Bearer user-3-token': {
-      name: 'user3',
-      email: 'user3@mail.com',
-      password: 'user123',
-      gender: genders[0],
-      birthDate: '2022/02/02',
-      number: 123456789,
-      city: 'city 3',
-    },
-  }
-
-  mockRegister(mock, '/register', users)
-  mockLogin(mock, '/login', users)
-  mockLogout(mock, '/logout')
+export const mockApiWithJwt = (mockApiWithJwtAdapter: MockAdapter) => {
+  mockStatus(mockApiWithJwtAdapter, '/status', users)
+  mockGetMessages(mockApiWithJwtAdapter, '/messages', messages)
+  mockSendMessage(mockApiWithJwtAdapter, '/messages', messages)
 }

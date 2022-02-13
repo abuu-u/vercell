@@ -4,7 +4,7 @@ import { RouteRecordRaw } from 'vue-router'
 const goHomeIfLoggedIn = () => {
   const user = useUser()
 
-  if (user.name) {
+  if (user) {
     return '/'
   }
 
@@ -14,7 +14,7 @@ const goHomeIfLoggedIn = () => {
 const goLoginIfNotLoggedIn = () => {
   const user = useUser()
 
-  if (!user.name) {
+  if (!user) {
     return '/login'
   }
 
@@ -49,6 +49,18 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('src/pages/LinkTelegram.vue'),
+      },
+    ],
+    beforeEnter: [goLoginIfNotLoggedIn],
+  },
+
+  {
+    path: '/chat',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/Chat.vue'),
       },
     ],
     beforeEnter: [goLoginIfNotLoggedIn],

@@ -100,7 +100,7 @@
 import { ref } from 'vue'
 import CustomInput from 'src/components/CustomInput.vue'
 import { email, required, shouldBeSame } from 'src/components/validators'
-import { useQuasar } from 'quasar'
+import { Loading, useQuasar } from 'quasar'
 import AuthLayout from 'src/layouts/AuthLayout.vue'
 import useUser from 'src/pinia/user'
 import { storeToRefs } from 'pinia'
@@ -152,6 +152,8 @@ const onSubmit = async () => {
     genderRef.value &&
     numberRef.value
   ) {
+    Loading.show()
+
     await user.register({
       name: nameRef.value,
       email: emailRef.value,
@@ -161,6 +163,8 @@ const onSubmit = async () => {
       gender: genderRef.value,
       number: numberRef.value,
     })
+
+    Loading.hide()
   }
 }
 </script>

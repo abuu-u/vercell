@@ -20,3 +20,22 @@ $positive: #21ba45;
 $negative: #c10015;
 $info: #31ccec;
 $warning: #f2c037;
+
+// message size
+
+$message-width: 300px;
+
+// message background
+
+$sent-global: #e0e0e0;
+$sent-personal: #e2eaff;
+$recived-global: #e0e0e0;
+$recived-personal: #e2eaff;
+$recived-rejected: #ffe2ea;
+
+// audio player colors
+
+$player-color: #c0acff;
+$proggres-color: $primary;
+$slider-color: $primary;
+$btn-color: $primary;

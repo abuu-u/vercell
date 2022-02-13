@@ -1,7 +1,7 @@
 import { Token } from '../token'
 
 interface User {
-  name: string
+  isBusy: boolean
 }
 
 export interface AuthRes {
