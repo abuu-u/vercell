@@ -77,11 +77,25 @@
 
     <q-input v-model="textRef" class="container" borderless hide-bottom-space>
       <template #prepend>
-        <q-btn icon="shuffle" flat round :disable="isBusy" @click="onDislke" />
+        <q-btn
+          v-if="status !== UserStatus.busy"
+          icon="shuffle"
+          flat
+          round
+          @click="onDislke"
+        />
+
+        <q-btn v-else icon="close" flat round @click="onStopConversation" />
       </template>
 
       <template #append>
-        <q-btn icon="mic" flat round @click="onRecordClick" />
+        <q-btn
+          icon="mic"
+          flat
+          round
+          :disable="status === UserStatus.unauthorised"
+          @click="onRecordClick"
+        />
       </template>
     </q-input>
   </q-page>
@@ -102,6 +116,7 @@ import { storeToRefs } from 'pinia'
 import RecordDialog from 'src/components/RecordDialog.vue'
 import AudioPlayer from 'src/components/AudioPlayer.vue'
 import useUser from 'src/pinia/user'
+import { UserStatus } from 'src/services/user'
 
 const textRef = ref('')
 const isRecordShow = ref(false)
@@ -120,7 +135,7 @@ const $q = useQuasar()
 const user = useUser()
 
 const { messageGroups } = storeToRefs(chat)
-const { isBusy } = storeToRefs(user)
+const { status } = storeToRefs(user)
 
 watchEffect(() => {
   if (chat.pagination === 0) {
@@ -175,6 +190,11 @@ const onLike = (id: number) => {
 
 const onDislke = async () => {
   await chat.getRandomMessage()
+}
+
+const onStopConversation = () => {
+  // TODO
+  user.status = UserStatus.free
 }
 
 const onSend = async (blob: Blob) => {

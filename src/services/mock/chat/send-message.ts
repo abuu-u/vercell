@@ -1,6 +1,7 @@
 import MockAdapter from 'axios-mock-adapter/types'
 import useUser from 'src/pinia/user'
 import { MessageType } from 'src/services/chat'
+import { UserStatus } from 'src/services/user'
 import { MockMessages } from '.'
 
 export const mockSendMessage = (
@@ -9,7 +10,7 @@ export const mockSendMessage = (
   mockMessages: MockMessages,
 ) => {
   mock.onPost(url).reply(async (config) => {
-    const { isBusy } = useUser()
+    const { status } = useUser()
 
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
@@ -43,7 +44,7 @@ export const mockSendMessage = (
           sizeInBytes: messageBlob.size,
           sentTime: new Date(),
           type:
-            id === '-1' && !isBusy
+            id === '-1' && status !== UserStatus.busy
               ? MessageType.sentGlobal
               : MessageType.sentPersonal,
         },

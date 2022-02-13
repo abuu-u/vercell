@@ -1,10 +1,11 @@
 import useUser from 'src/pinia/user'
+import { UserStatus } from 'src/services/user'
 import { RouteRecordRaw } from 'vue-router'
 
 const goHomeIfLoggedIn = () => {
   const user = useUser()
 
-  if (user) {
+  if (user.status !== UserStatus.unauthorised) {
     return '/'
   }
 
@@ -14,7 +15,7 @@ const goHomeIfLoggedIn = () => {
 const goLoginIfNotLoggedIn = () => {
   const user = useUser()
 
-  if (!user) {
+  if (user.status === UserStatus.unauthorised) {
     return '/login'
   }
 
@@ -63,7 +64,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/Chat.vue'),
       },
     ],
-    beforeEnter: [goLoginIfNotLoggedIn],
   },
 
   // Always leave this as last one,

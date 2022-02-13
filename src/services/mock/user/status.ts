@@ -1,4 +1,5 @@
 import MockAdapter from 'axios-mock-adapter/types'
+import { UserStatus } from 'src/services/user'
 import { MockUsers } from '.'
 
 export const mockStatus = (
@@ -35,7 +36,7 @@ export const mockStatus = (
       200,
       {
         user: {
-          isBusy: Math.random() > 0.5,
+          status: Math.random() > 0.5 ? UserStatus.busy : UserStatus.free,
         },
       },
     ]

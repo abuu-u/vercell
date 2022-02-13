@@ -1,4 +1,5 @@
 import MockAdapter from 'axios-mock-adapter/types'
+import { UserStatus } from 'src/services/user'
 import { RegData } from 'src/services/user/register'
 import { MockUsers } from '.'
 
@@ -41,7 +42,7 @@ export const mockRegister = (
           },
 
           user: {
-            isBusy: Math.random() > 0.5,
+            status: Math.random() > 0.5 ? UserStatus.busy : UserStatus.free,
           },
         },
       ]

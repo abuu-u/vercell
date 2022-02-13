@@ -1,7 +1,13 @@
 import { Token } from '../token'
 
+export enum UserStatus {
+  free,
+  busy,
+  unauthorised,
+}
+
 interface User {
-  isBusy: boolean
+  status: UserStatus
 }
 
 export interface AuthRes {

@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
-import { getUser } from 'src/services/user'
+import { getUser, UserStatus } from 'src/services/user'
 import { login, LoginData } from 'src/services/user/login'
 import { logout } from 'src/services/user/logout'
 import { RegData, register } from 'src/services/user/register'
 import { getStatus } from 'src/services/user/status'
 
 interface User {
-  isBusy: boolean
+  status: UserStatus
   error: string
 }
 
@@ -14,7 +14,7 @@ const useUser = defineStore({
   id: 'user-module',
   state(): User {
     return {
-      isBusy: getUser()?.isBusy ?? false,
+      status: getUser()?.status ?? UserStatus.unauthorised,
       error: '',
     }
   },
@@ -28,7 +28,7 @@ const useUser = defineStore({
       if (res.error) {
         this.error = res.error
       } else {
-        this.isBusy = res.data?.user.isBusy ?? false
+        this.status = res.data?.user.status ?? UserStatus.unauthorised
         await this.$router.push('/link-telegram')
       }
     },
@@ -41,13 +41,13 @@ const useUser = defineStore({
       if (res.error) {
         this.error = res.error
       } else {
-        this.isBusy = res.data?.user.isBusy ?? false
+        this.status = res.data?.user.status ?? UserStatus.unauthorised
         await this.$router.push('/')
       }
     },
 
     async logout() {
-      this.isBusy = false
+      this.status = UserStatus.unauthorised
       await logout()
     },
 
@@ -57,7 +57,7 @@ const useUser = defineStore({
       if (res.error) {
         //
       } else {
-        this.isBusy = res.data?.user.isBusy ?? false
+        this.status = res.data?.user.status ?? UserStatus.unauthorised
       }
     },
   },

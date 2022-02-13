@@ -16,7 +16,7 @@
     <div v-if="isRateShow" class="rate">
       <q-btn
         class="rate__btn"
-        :disable="user.isBusy"
+        :disable="!isFree"
         outline
         color="primary"
         @click="onLikeClick"
@@ -24,7 +24,7 @@
       >
       <q-btn
         class="rate__btn"
-        :disable="user.isBusy"
+        :disable="!isFree"
         outline
         color="primary"
         @click="onDislikeClick"
@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import useUser from 'src/pinia/user'
 import { MessageType } from 'src/services/chat'
+import { UserStatus } from 'src/services/user'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -57,6 +58,8 @@ const messageType = MessageType[props.type]
 const isRateShow = computed(() => props.type === MessageType.recivedGlobal)
 
 const user = useUser()
+
+const isFree = computed(() => user.status === UserStatus.free)
 
 const onLikeClick = () => {
   emit('like', props.id)

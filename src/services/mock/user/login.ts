@@ -26,7 +26,7 @@ export const mockLogin = (
               refresh: data[0].split(' ')[1],
             },
             user: {
-              isBusy: data[1].isBusy,
+              status: data[1].status,
             },
           },
         ]
