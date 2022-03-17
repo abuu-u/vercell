@@ -67,6 +67,7 @@ const onCodeClick = async () => {
 
 <style lang="scss">
 .link-telegram {
-  width: 400px;
+  max-width: 420px;
+  padding: 0 20px;
 }
 </style>

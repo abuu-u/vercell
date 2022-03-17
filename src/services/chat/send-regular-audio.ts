@@ -1,12 +1,8 @@
 import axios from 'axios'
-import { Audio, AudioRes } from '.'
+import { Audio, AudioRes, SendCommonArgs } from '.'
 import { apiWithJwt } from '../apiWithJwt'
 
-const error: Record<string, string> = {
-  NOT_FOUND: 'Не осталось рандомых аудио, попробуйте позже.',
-}
-
-type GetRandomMessage = () => Promise<
+type SendRegularAudio = ({ audio }: SendCommonArgs) => Promise<
   | {
       message: Audio
       error?: never
@@ -17,9 +13,18 @@ type GetRandomMessage = () => Promise<
     }
 >
 
-export const getRandomMessage: GetRandomMessage = async () => {
+const error: Record<string, string> = {}
+
+export const sendRegularAudio: SendRegularAudio = async ({ audio }) => {
   try {
-    const res = await apiWithJwt.get<AudioRes>('/audio/random')
+    const formData = new FormData()
+    formData.append('audio', audio, 'audio.ogg')
+
+    const res = await apiWithJwt.post<AudioRes>('/audio/regular', formData, {
+      headers: {
+        accept: 'application/json',
+      },
+    })
 
     return {
       message: new Audio(res.data),
@@ -28,8 +33,7 @@ export const getRandomMessage: GetRandomMessage = async () => {
     let err = 'unexpected error'
 
     if (axios.isAxiosError(e)) {
-      const errTxt =
-        e.response?.status === 404 ? error.NOT_FOUND : error[e.message]
+      const errTxt = error[e.message]
 
       if (errTxt) {
         err = errTxt

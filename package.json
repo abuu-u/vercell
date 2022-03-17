@@ -21,6 +21,7 @@
     "core-js": "^3.6.5",
     "pinia": "^2.0.9",
     "quasar": "^2.4.13",
+    "socket.io-client": "^4.4.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
     "wavesurfer.js": "^5.2.0"

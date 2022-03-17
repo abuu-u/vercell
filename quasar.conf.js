@@ -46,6 +46,7 @@ module.exports = configure((ctx) => ({
 
     'roboto-font', // optional, you are not bound to it
     'material-icons', // optional, you are not bound to it
+    'mdi-v6',
   ],
 
   // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
@@ -54,7 +55,10 @@ module.exports = configure((ctx) => ({
     distDir: ctx.mode.spa ? 'public' : null,
     vueRouterMode: 'history', // available values: 'hash', 'history'
     env: {
-      API_BASE_URL: '/api',
+      // API_BASE_URL: 'http://localhost:3000',
+      // WS_URL: 'ws://localhost:3000',
+      API_BASE_URL: 'http://152.67.65.253:3000',
+      WS_URL: 'ws://http://152.67.65.253:3000',
     },
 
     // transpile: false,

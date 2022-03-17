@@ -94,7 +94,7 @@ const onRecordClick = async () => {
 
       mr.onstop = () => {
         audioBlob.value = new Blob(chunks.value, {
-          type: 'audio/webm;codecs=pcm',
+          type: 'audio/ogg;codecs=opus',
         })
       }
 
@@ -171,6 +171,7 @@ const onOutsideClick = (evt: MouseEvent) => {
 const onReRecordClick = () => {
   isRecorded.value = false
   chunks.value = []
+  window.URL.revokeObjectURL(audioSrc.value)
   audioBlob.value = undefined
 }
 
@@ -179,6 +180,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.URL.revokeObjectURL(audioSrc.value)
+
   window.removeEventListener('click', onOutsideClick)
 })
 </script>

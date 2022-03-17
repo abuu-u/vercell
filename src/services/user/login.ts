@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AuthRes, setUser } from '.'
+import { AuthRes, setUser, User } from '.'
 import { api } from '../api'
 import { setToken } from '../token'
 
@@ -14,35 +14,43 @@ const error: Record<string, string> = {
 
 type Login = (data: LoginData) => Promise<
   | {
-      data: Omit<AuthRes, 'token'>
+      user: User
       error?: never
     }
   | {
-      data?: never
+      user?: never
       error: string
     }
 >
 
 export const login: Login = async (data) => {
   try {
-    const res = await api.post<AuthRes>('/login', data)
+    const res = await api.post<AuthRes>('/users/login', data, {
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
 
-    setToken(res.data.token)
-    setUser(res.data.user)
+    const { token, ...userObj } = res.data
+    const user = new User(userObj)
+
+    setToken(token)
+    setUser(user)
 
     return {
-      data: {
-        user: res.data.user,
-      },
+      user,
     }
   } catch (e) {
     let err = 'unexpected error'
 
     if (axios.isAxiosError(e)) {
-      const errTxt = error[(e.response?.data as { message: string }).message]
+      const errTxt = error[e.message]
 
       if (errTxt) {
         err = errTxt
+      } else {
+        err += `: ${e.message}`
       }
     } else {
       // eslint-disable-next-line no-console

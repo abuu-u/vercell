@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { getUser, UserStatus } from 'src/services/user'
+import { finishCovnersation } from 'src/services/user/finish-conversation'
 import { login, LoginData } from 'src/services/user/login'
 import { logout } from 'src/services/user/logout'
 import { RegData, register } from 'src/services/user/register'
-import { getStatus } from 'src/services/user/status'
 
 interface User {
   status: UserStatus
@@ -27,9 +27,10 @@ const useUser = defineStore({
 
       if (res.error) {
         this.error = res.error
-      } else {
-        this.status = res.data?.user.status ?? UserStatus.unauthorised
-        await this.$router.push('/link-telegram')
+      } else if (res.user) {
+        this.status = res.user.status
+        window.location.href = '/chat'
+        // await this.$router.push('/link-telegram')
       }
     },
 
@@ -40,24 +41,34 @@ const useUser = defineStore({
 
       if (res.error) {
         this.error = res.error
-      } else {
-        this.status = res.data?.user.status ?? UserStatus.unauthorised
-        await this.$router.push('/')
+      } else if (res.user) {
+        this.status = res.user.status
+        window.location.href = '/chat'
+        // await this.$router.push('/')
       }
     },
 
     async logout() {
-      this.status = UserStatus.unauthorised
-      await logout()
+      try {
+        this.status = UserStatus.unauthorised
+        await logout()
+        window.location.reload()
+      } catch {
+        window.location.reload()
+      }
     },
 
-    async getStatus() {
-      const res = await getStatus()
+    setStatus(staus: UserStatus) {
+      this.status = staus
+    },
 
-      if (res.error) {
-        //
-      } else {
-        this.status = res.data?.user.status ?? UserStatus.unauthorised
+    async finishCovnersation() {
+      this.error = ''
+
+      const res = await finishCovnersation()
+
+      if (res !== void 0) {
+        this.error = res.error
       }
     },
   },

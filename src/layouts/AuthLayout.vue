@@ -40,6 +40,7 @@ const emit = defineEmits<{
 
 <style lang="scss">
 .form-wrapper {
-  width: 320px;
+  width: 400px;
+  padding: 0 20px;
 }
 </style>

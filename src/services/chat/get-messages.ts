@@ -1,16 +1,14 @@
 import axios from 'axios'
-import { Message, MessageRes } from '.'
+import { Audio, AudioRes } from '.'
 import { apiWithJwt } from '../apiWithJwt'
 
-interface GetMessagesRes {
-  messages: MessageRes[]
-}
+export const CHUNK_SIZE = 10
 
 const error: Record<string, string> = {}
 
 type GetMessages = (pagination: number) => Promise<
   | {
-      messages: Message[]
+      messages: Audio[]
       error?: never
     }
   | {
@@ -19,35 +17,37 @@ type GetMessages = (pagination: number) => Promise<
     }
 >
 
-export const getMessages: GetMessages = async (pagination = 0) => {
+export const getMessages: GetMessages = async (pagination) => {
   try {
-    const { data } = await apiWithJwt.get<GetMessagesRes>('/messages', {
+    const res = await apiWithJwt.get<AudioRes[]>('/audio', {
       params: {
-        pagination,
+        count: CHUNK_SIZE,
+        offset: pagination,
       },
     })
 
-    const messages = data.messages.map((it) => ({
-      ...it,
-      sentTime: new Date(it.sentTime),
-    }))
-
     return {
-      messages,
+      messages: Audio.fromArray(res.data),
     }
   } catch (e) {
     let err = 'unexpected error'
 
     if (axios.isAxiosError(e)) {
-      const errTxt = error[(e.response?.data as { message: string })?.message]
+      const errTxt = error[e.message]
+
+      if (e.response?.status === 401) {
+        return { messages: [] }
+      }
 
       if (errTxt) {
         err = errTxt
+      } else {
+        err += `: ${e.message}`
       }
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(e)
     }
+
+    // eslint-disable-next-line no-console
+    console.log(e)
 
     return {
       error: err,

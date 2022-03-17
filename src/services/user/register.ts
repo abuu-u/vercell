@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AuthRes, setUser } from '.'
+import { AuthRes, setUser, User } from '.'
 import { api } from '../api'
 import { setToken } from '../token'
 
@@ -8,12 +8,8 @@ export const genders = ['male', 'female'] as const
 export type Gender = typeof genders[number]
 
 export interface RegData {
-  name: string
-  gender: Gender
-  birthDate: string
+  username: string
   email: string
-  number: number
-  city: string
   password: string
 }
 
@@ -27,35 +23,43 @@ const error: Record<string, string> = {
 
 type Register = (data: RegData) => Promise<
   | {
-      data: Omit<AuthRes, 'token'>
+      user: User
       error?: never
     }
   | {
-      data?: never
+      user?: never
       error: string
     }
 >
 
 export const register: Register = async (data) => {
   try {
-    const res = await api.post<AuthRes>('/register', data)
+    const res = await api.post<AuthRes>('/users/registration', data, {
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
 
-    setToken(res.data.token)
-    setUser(res.data.user)
+    const { token, ...userObj } = res.data
+    const user = new User(userObj)
+
+    setToken(token)
+    setUser(user)
 
     return {
-      data: {
-        user: res.data.user,
-      },
+      user,
     }
   } catch (e) {
     let err = 'unexpected error'
 
     if (axios.isAxiosError(e)) {
-      const errTxt = error[(e.response?.data as { message: string }).message]
+      const errTxt = error[e.message]
 
       if (errTxt) {
         err = errTxt
+      } else {
+        err += `: ${e.message}`
       }
     } else {
       // eslint-disable-next-line no-console

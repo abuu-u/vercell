@@ -3,9 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import useUser from './pinia/user'
+import initWs from './services/ws'
 
-const user = useUser()
-
-void user.getStatus()
+initWs()
 </script>

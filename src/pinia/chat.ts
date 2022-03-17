@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
-import { Message } from 'src/services/chat'
-import { getMessages } from 'src/services/chat/get-messages'
+import {
+  Audio,
+  AudioType,
+  SendCommonArgs,
+  SendRequestArgs,
+} from 'src/services/chat'
+import { declineRequest } from 'src/services/chat/decline-request'
+import { CHUNK_SIZE, getMessages } from 'src/services/chat/get-messages'
 import { getRandomMessage } from 'src/services/chat/get-random-message'
-import { sendMessage } from 'src/services/chat/send-message'
-
-const CHUNK_SIZE = 20
+import { sendAcceptAudio } from 'src/services/chat/send-accept-audio'
+import { sendGreetingAudio } from 'src/services/chat/send-greeting-audio'
+import { sendRegularAudio } from 'src/services/chat/send-regular-audio'
+import { sendRequestAudio } from 'src/services/chat/send-request-audio'
 
 export enum Status {
   idle,
@@ -14,7 +21,7 @@ export enum Status {
 
 interface MessageGroup {
   date: string
-  messages: Message[]
+  messages: Audio[]
 }
 
 interface Chat {
@@ -40,20 +47,20 @@ const MONTH = [
 ]
 
 const messagesToMessageGroups = (
-  messages: Message[],
-  lastMessage?: Message,
-): { messageGroup: MessageGroup[]; messagesToMerge: Message[] } => {
+  messages: Audio[],
+  firstMessage?: Audio,
+): { messageGroup: MessageGroup[]; messagesToMerge: Audio[] } => {
   const messageGroup: MessageGroup[] = []
   const dates: string[] = []
   const dictionary: { [date: string]: number } = {}
-  let shouldMergeWithLastMessage = false
-  const messagesToMerge: Message[] = []
+  let shouldMergeWithFirstMessage = false
+  const messagesToMerge: Audio[] = []
 
   if (
     messages[0]?.sentTime.toLocaleDateString() ===
-    lastMessage?.sentTime.toLocaleDateString()
+    firstMessage?.sentTime.toLocaleDateString()
   ) {
-    shouldMergeWithLastMessage = true
+    shouldMergeWithFirstMessage = true
   }
 
   messages.forEach((message) => {
@@ -64,7 +71,7 @@ const messagesToMessageGroups = (
     const dateIndex =
       dictionary[date] ?? (dictionary[date] = dates.push(date) - 1)
 
-    if (shouldMergeWithLastMessage && dateIndex === 0) {
+    if (shouldMergeWithFirstMessage && dateIndex === 0) {
       messagesToMerge.push(message)
     } else if (messageGroup[dateIndex]?.date) {
       messageGroup[dateIndex].messages.push(message)
@@ -132,35 +139,89 @@ const useChat = defineStore({
       }
     },
 
+    addMessageToMessageGroups(message: Audio) {
+      const { messageGroup, messagesToMerge } = messagesToMessageGroups(
+        [message],
+        this.messageGroups[0]?.messages[0],
+      )
+
+      this.messageGroups[0]?.messages.unshift(...messagesToMerge)
+      this.messageGroups.unshift(...messageGroup)
+    },
+
     async getRandomMessage() {
       this.error = ''
       const res = await getRandomMessage()
       if (res.error) {
         this.error = res.error
       } else if (res.message) {
-        const { messageGroup, messagesToMerge } = messagesToMessageGroups(
-          [res.message],
-          this.messageGroups[0]?.messages[0],
-        )
-
-        this.messageGroups[0]?.messages.unshift(...messagesToMerge)
-        this.messageGroups.unshift(...messageGroup)
+        this.addMessageToMessageGroups(res.message)
       }
     },
 
-    async sendMessage(blob: Blob, id: number) {
+    async sendGreetingAudio(data: SendCommonArgs) {
       this.error = ''
-      const res = await sendMessage(blob, id)
+
+      const res = await sendGreetingAudio(data)
+
       if (res.error) {
         this.error = res.error
       } else if (res.message) {
-        const { messageGroup, messagesToMerge } = messagesToMessageGroups(
-          [res.message],
-          this.messageGroups[0]?.messages[0],
-        )
+        this.addMessageToMessageGroups(res.message)
+      }
+    },
 
-        this.messageGroups[0]?.messages.unshift(...messagesToMerge)
-        this.messageGroups.unshift(...messageGroup)
+    async sendRegularAudio(data: SendCommonArgs) {
+      this.error = ''
+
+      const res = await sendRegularAudio(data)
+
+      if (res.error) {
+        this.error = res.error
+      } else if (res.message) {
+        this.addMessageToMessageGroups(res.message)
+      }
+    },
+
+    async sendRequestAudio(data: SendRequestArgs) {
+      this.error = ''
+
+      const res = await sendRequestAudio(data)
+
+      if (res.error) {
+        this.error = res.error
+      } else if (res.message) {
+        this.addMessageToMessageGroups(res.message)
+      }
+    },
+
+    async sendAcceptAudio(data: SendRequestArgs) {
+      this.error = ''
+
+      const res = await sendAcceptAudio(data)
+
+      if (res.error) {
+        this.error = res.error
+      } else if (res.message) {
+        this.addMessageToMessageGroups(res.message)
+      }
+    },
+
+    async declineRequest(id: number) {
+      this.error = ''
+
+      const res = await declineRequest({ id })
+
+      if (res !== void 0) {
+        this.error = res.error
+      } else {
+        this.messageGroups.forEach((mg) => {
+          const msg = mg.messages.find((m) => m.id === id)
+
+          if (msg) {
+            msg.type = AudioType.recivedRejectedRequest
+          }
+        })
       }
     },
   },
